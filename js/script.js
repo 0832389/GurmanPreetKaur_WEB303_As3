@@ -1,55 +1,51 @@
-// Method 1: Using $.getJSON
-function getTeamDataWithGetJSON() {
-  $.getJSON('team.json', function (data) {
-    // Clear existing content
-    $('#team').empty();
-
-    // Loop through the team data and append it to the #team div
-    $.each(data.team, function (index, member) {
-      var memberDiv = $('<div>');
-      memberDiv.append($('<h2>').text(member.name));
-      memberDiv.append($('<h5>').text(member.position));
-      memberDiv.append($('<p>').text(member.bio));
-      $('#team').append(memberDiv);
+function getTeamDataUsingJSON() {
+  $.getJSON('team.json', function(data) {
+    $.each(data.team, function(index, member) {
+      var $teamDiv = $('#team');
+      var $memberDiv = $('<div>');
+      var $nameHeader = $('<h2>').text(member.name);
+      var $positionHeader = $('<h5>').text(member.position);
+      var $bioParagraph = $('<p>').text(member.bio);
+      
+      $memberDiv.append($nameHeader, $positionHeader, $bioParagraph);
+      $teamDiv.append($memberDiv);
     });
-  })
-  .fail(function() {
-    // Display an error message if the request fails
-    $('#team').text('Error: Content could not be retrieved.');
   });
 }
 
-// Method 2: Using $.ajax
-function getTeamDataWithAjax() {
-  // Display "Loading..." message
-  $('#team').text('Loading...');
+
+
+function getTeamDataUsingAjax() {
+  var $teamDiv = $('#team');
+  $teamDiv.text('Loading...'); // Display "Loading..." while fetching data
 
   $.ajax({
     url: 'team.json',
     type: 'GET',
     dataType: 'json',
-    success: function (data) {
-      // Clear the "Loading..." message
-      $('#team').empty();
+    success: function(data) {
+      setTimeout(function() {
+        $teamDiv.empty(); // Clear the "Loading..." message
+        $.each(data.team, function(index, member) {
+          var $memberDiv = $('<div>');
+          var $nameHeader = $('<h2>').text(member.name);
+          var $positionHeader = $('<h5>').text(member.position);
+          var $bioParagraph = $('<p>').text(member.bio);
 
-      // Loop through the team data and append it to the #team div
-      $.each(data.team, function (index, member) {
-        var memberDiv = $('<div>');
-        memberDiv.append($('<h2>').text(member.name));
-        memberDiv.append($('<h5>').text(member.position));
-        memberDiv.append($('<p>').text(member.bio));
-        $('#team').append(memberDiv);
-      });
+          $memberDiv.append($nameHeader, $positionHeader, $bioParagraph);
+          $teamDiv.append($memberDiv);
+        });
+      }, 3000); // Delay for 3 seconds before displaying content
     },
-    error: function () {
-      // Display an error message if the request fails
-      $('#team').text('Error: Content could not be retrieved.');
+    error: function(xhr, status, error) {
+      $teamDiv.text('Error: Content could not be retrieved.'); // Display error message
+      console.error('Error loading team data:', error);
     }
   });
 }
 
-// Call one of the methods within the jQuery ready function to display the data
-$(document).ready(function () {
-  // You can choose which method to call here
-  getTeamDataWithGetJSON();
+$(document).ready(function() {
+  getTeamDataUsingAjax(); // Call the method to fetch and display team data
 });
+
+
